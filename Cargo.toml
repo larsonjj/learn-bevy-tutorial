@@ -1,8 +1,8 @@
 [package]
-name = "bevy_game" # ToDo
+name = "learn_bevy_tutorial"
 version = "0.1.0"
 publish = false
-authors = ["Niklas Eicker <git@nikl.me>"] # ToDo: you are the author ;)
+authors = ["Jake Larson"]
 edition = "2021"
 exclude = ["dist", "build", "assets", "credits"]
 
@@ -60,4 +60,4 @@ winit = { version = "0.28", default-features = false }
 image = { version = "0.24", default-features = false }
 
 [build-dependencies]
-embed-resource = "1.4"
+embed-resource = "2.0.0"
