@@ -16,7 +16,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Learn Bevy Tutorial".to_string(),
-                resolution: (800., 600.).into(),
+                resolution: (960., 540.).into(),
                 canvas: Some("#bevy".to_owned()),
                 ..default()
             }),

@@ -43,10 +43,10 @@ fn setup_menu(
                 margin: UiRect::all(Val::Auto),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
-                ..Default::default()
+                ..default()
             },
             background_color: button_colors.normal.into(),
-            ..Default::default()
+            ..default()
         })
         .with_children(|parent| {
             parent.spawn(TextBundle::from_section(
