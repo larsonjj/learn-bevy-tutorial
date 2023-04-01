@@ -54,7 +54,7 @@ Audio in web-builds can have issues in some browsers. This seems to be a general
 
 # License
 
-This project is licensed under [CC0 1.0 Universal](LICENSE) except some content of `assets` and the Bevy icons in the `build` directory (see [Credits](credits/CREDITS.md)). Go crazy and feel free to show me whatever you build with this ([@nikl_me][nikl-twitter] / [@nikl_me@mastodon.online][nikl-mastodon] ).
+This project is licensed under [CC0 1.0 Universal](LICENSE) except some content of `assets` and the Bevy icons in the `build` directory (see [Credits](credits/CREDITS.md)).
 
 [bevy]: https://bevyengine.org/
 [bevy-learn]: https://bevyengine.org/learn/
