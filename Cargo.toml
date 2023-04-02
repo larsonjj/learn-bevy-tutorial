@@ -31,6 +31,7 @@ dev = [
 default = [
     "bevy/animation",
     "bevy/bevy_asset",
+    "bevy/bevy_audio",
     "bevy/bevy_scene",
     "bevy/bevy_winit",
     "bevy/bevy_core_pipeline",
@@ -47,11 +48,11 @@ default = [
     # "bevy/ktx2",
     "bevy/filesystem_watcher",
     # "bevy/tonemapping_luts"
+    "bevy/vorbis"
 ]
 
 [dependencies]
 bevy = { version = "0.10.1", default-features = false }
-bevy_kira_audio = { version = "0.15" }
 bevy_asset_loader = { version = "0.16" }
 rand = { version = "0.8" }
 
