@@ -23,13 +23,17 @@ impl Plugin for LoadingPlugin {
 
 #[derive(AssetCollection, Resource)]
 pub struct FontAssets {
-    #[asset(path = "fonts/FiraSans-Bold.ttf")]
-    pub fira_sans: Handle<Font>,
+    #[asset(path = "fonts/font_space/pixeloid_mono.ttf")]
+    pub pixeliod_mono: Handle<Font>,
+    #[asset(path = "fonts/font_space/pixeloid_sans_bold.ttf")]
+    pub pixeliod_bold: Handle<Font>,
+    #[asset(path = "fonts/font_space/pixeloid_sans.ttf")]
+    pub pixeliod_sans: Handle<Font>,
 }
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
-    #[asset(path = "audio/chosic/fluffing-a-duck.ogg")]
+    #[asset(path = "audio/chosic/fluffing_a_duck.ogg")]
     pub background_music: Handle<AudioSource>,
     #[asset(path = "audio/kenney/interface/pluck_001.ogg")]
     pub enemy_direction_changed_1: Handle<AudioSource>,
