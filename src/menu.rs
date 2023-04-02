@@ -16,7 +16,7 @@ impl Plugin for MenuPlugin {
 }
 
 #[derive(Resource)]
-struct ButtonColors {
+pub struct ButtonColors {
     normal: Color,
     hovered: Color,
 }
@@ -30,12 +30,11 @@ impl Default for ButtonColors {
     }
 }
 
-fn setup_menu(
+pub fn setup_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
 ) {
-    commands.spawn(Camera2dBundle::default());
     commands
         .spawn(ButtonBundle {
             style: Style {
