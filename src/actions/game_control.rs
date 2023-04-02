@@ -1,6 +1,4 @@
-use bevy::{
-    prelude::{Input, KeyCode, Res}
-};
+use bevy::prelude::{Input, KeyCode, Res};
 
 pub enum GameControl {
     Up,

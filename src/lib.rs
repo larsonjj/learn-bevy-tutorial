@@ -1,13 +1,13 @@
-mod camera;
 mod actions;
 mod audio;
+mod camera;
 mod loading;
 mod menu;
 mod player;
 
-use crate::camera::CameraPlugin;
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
+use crate::camera::CameraPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
