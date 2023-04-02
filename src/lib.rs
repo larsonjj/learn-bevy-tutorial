@@ -1,6 +1,7 @@
 mod actions;
 mod audio;
 mod camera;
+mod enemy;
 mod loading;
 mod menu;
 mod player;
@@ -8,6 +9,7 @@ mod player;
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::camera::CameraPlugin;
+use crate::enemy::EnemyPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
@@ -36,12 +38,13 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<GameState>()
+            .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
             .add_plugin(ActionsPlugin)
-            .add_plugin(InternalAudioPlugin)
-            .add_plugin(PlayerPlugin);
+            .add_plugin(PlayerPlugin)
+            .add_plugin(EnemyPlugin);
 
         #[cfg(debug_assertions)]
         {

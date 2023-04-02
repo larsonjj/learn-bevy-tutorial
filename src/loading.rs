@@ -30,12 +30,20 @@ pub struct FontAssets {
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
-    #[asset(path = "audio/flying.ogg")]
-    pub flying: Handle<AudioSource>,
+    #[asset(path = "audio/chosic/fluffing-a-duck.ogg")]
+    pub background_music: Handle<AudioSource>,
+    #[asset(path = "audio/kenney/interface/pluck_001.ogg")]
+    pub enemy_direction_changed_1: Handle<AudioSource>,
+    #[asset(path = "audio/kenney/interface/pluck_002.ogg")]
+    pub enemy_direction_changed_2: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]
 pub struct TextureAssets {
     #[asset(path = "textures/kenney/rolling_ball/ball_blue_large.png")]
     pub texture_ball: Handle<Image>,
+    #[asset(path = "textures/kenney/rolling_ball/ball_red_large.png")]
+    pub enemy_ball: Handle<Image>,
+    #[asset(path = "textures/kenney/rolling_ball/star.png")]
+    pub star: Handle<Image>,
 }
