@@ -1,5 +1,6 @@
 use crate::actions::Actions;
 use crate::loading::TextureAssets;
+use crate::physics::PLAY_AREA_BORDER_MARGIN;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -18,8 +19,7 @@ const PLAYER_SIZE: f32 = 64.;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(move_player.in_set(OnUpdate(GameState::Playing)))
-            .add_system(confine_player_to_window.in_set(OnUpdate(GameState::Playing)));
+            .add_system(move_player_controller.in_set(OnUpdate(GameState::Playing)));
     }
 }
 
@@ -37,6 +37,8 @@ fn spawn_player(
             ..default()
         })
         .insert(Player)
+        .insert(RigidBody::KinematicPositionBased)
+        .insert(KinematicCharacterController::default())
         .insert(Collider::ball(PLAYER_SIZE / 2.0))
         .insert(GravityScale(0.0))
         .insert(LockedAxes::ROTATION_LOCKED)
@@ -63,33 +65,33 @@ fn move_player(
     }
 }
 
-// function to confine player movement to the window
-fn confine_player_to_window(
-    mut player_query: Query<&mut Transform, With<Player>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
+fn move_player_controller(
+    time: Res<Time>,
+    actions: Res<Actions>,
+    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
 ) {
-    if let Ok(mut player) = player_query.get_single_mut() {
-        let window = window_query.get_single().unwrap();
-        let half_player_size = PLAYER_SIZE / 2.;
-        let x_min = 0.0 + half_player_size;
-        let x_max = window.width() - half_player_size;
-        let y_min = 0.0 + half_player_size;
-        let y_max = window.height() - half_player_size;
+    if actions.player_movement.is_none() {
+        return;
+    }
 
-        let mut translation = player.translation;
+    let speed = PLAYER_SPEED;
 
-        if translation.x < x_min {
-            translation.x = x_min;
-        } else if translation.x > x_max {
-            translation.x = x_max;
+    for mut player_controller in &mut player_query {
+        // Print out player controller translation
+        println!(
+            "Player controller translation: {:?}",
+            player_controller.translation
+        );
+        player_controller.translation = match player_controller.translation {
+            Some(mut vector) => {
+                vector.x = actions.player_movement.unwrap().x * speed * time.delta_seconds();
+                vector.y = actions.player_movement.unwrap().y * speed * time.delta_seconds();
+                Some(vector)
+            }
+            None => Some(Vec2::new(
+                actions.player_movement.unwrap().x * speed * time.delta_seconds(),
+                actions.player_movement.unwrap().y * speed * time.delta_seconds(),
+            )),
         }
-
-        if translation.y < y_min {
-            translation.y = y_min;
-        } else if translation.y > y_max {
-            translation.y = y_max;
-        }
-
-        player.translation = translation;
     }
 }
