@@ -4,6 +4,7 @@ mod camera;
 mod enemy;
 mod loading;
 mod menu;
+mod physics;
 mod player;
 
 use crate::actions::ActionsPlugin;
@@ -12,6 +13,7 @@ use crate::camera::CameraPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
+use crate::physics::InternalPhysicsPlugin;
 use crate::player::PlayerPlugin;
 
 #[cfg(debug_assertions)]
@@ -39,9 +41,10 @@ impl Plugin for GamePlugin {
         app.add_state::<GameState>()
             .add_plugin(CameraPlugin)
             .add_plugin(LoadingPlugin)
-            .add_plugin(MenuPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
+            .add_plugin(InternalPhysicsPlugin)
+            .add_plugin(MenuPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(EnemyPlugin);
 

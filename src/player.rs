@@ -3,6 +3,7 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy_rapier2d::prelude::*;
 
 pub struct PlayerPlugin;
 
@@ -35,7 +36,11 @@ fn spawn_player(
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
             ..default()
         })
-        .insert(Player);
+        .insert(Player)
+        .insert(Collider::ball(PLAYER_SIZE / 2.0))
+        .insert(GravityScale(0.0))
+        .insert(LockedAxes::ROTATION_LOCKED)
+        .insert(ActiveEvents::COLLISION_EVENTS);
 }
 
 fn move_player(

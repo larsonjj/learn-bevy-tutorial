@@ -2,6 +2,7 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy_rapier2d::prelude::*;
 use rand::prelude::*;
 
 const ENEMY_SPEED: f32 = 150.;
@@ -39,11 +40,14 @@ fn spawn_enemies(
         let x = random::<f32>() * window.width();
         let y = random::<f32>() * window.height();
         commands
-            .spawn(SpriteBundle {
-                texture: textures.enemy_ball.clone(),
-                transform: Transform::from_xyz(x, y, 0.0),
-                ..default()
-            })
+            .spawn((
+                SpriteBundle {
+                    texture: textures.enemy_ball.clone(),
+                    transform: Transform::from_xyz(x, y, 0.0),
+                    ..default()
+                },
+                Collider::ball(ENEMY_SIZE / 2.0),
+            ))
             .insert(Enemy {
                 direction: Vec2::new(random::<f32>() * 2. - 1., random::<f32>() * 2. - 1.),
             });

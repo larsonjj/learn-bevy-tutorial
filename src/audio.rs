@@ -17,7 +17,13 @@ impl Plugin for InternalAudioPlugin {
 struct BackgroundMusicAudio(Handle<AudioSource>);
 
 fn start_audio(audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
-    audio.play(audio_assets.background_music.clone());
+    audio.play_with_settings(
+        audio_assets.background_music.clone(),
+        PlaybackSettings {
+            volume: 0.3,
+            ..Default::default()
+        },
+    );
 }
 
 fn control_enemy_direction_changed_sound(
@@ -26,9 +32,21 @@ fn control_enemy_direction_changed_sound(
     mut enemy_direction_changed_events: EventReader<EnemyDirectionChangedEvent>,
 ) {
     if !enemy_direction_changed_events.is_empty() {
-        println!("Enemy direction changed event received");
         // This prevents events staying active on the next frame.
         enemy_direction_changed_events.clear();
-        audio.play(audio_assets.enemy_direction_changed_1.clone());
+
+        // Randomely play one of the two sounds
+        let sound_effect = if rand::random() {
+            audio_assets.enemy_direction_changed_1.clone()
+        } else {
+            audio_assets.enemy_direction_changed_2.clone()
+        };
+        audio.play_with_settings(
+            sound_effect,
+            PlaybackSettings {
+                volume: 0.5,
+                ..Default::default()
+            },
+        );
     }
 }
