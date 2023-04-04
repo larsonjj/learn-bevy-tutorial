@@ -37,8 +37,14 @@ fn spawn_enemies(
     let window = window_query.get_single().unwrap();
 
     for _ in 0..NUMBER_OF_ENEMIES {
-        let x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
-        let y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
+        let x = PLAY_AREA_BORDER_MARGIN
+            + ENEMY_SIZE
+            + 50.
+            + (random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE));
+        let y = PLAY_AREA_BORDER_MARGIN
+            + ENEMY_SIZE
+            + 50.
+            + (random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE));
         commands
             .spawn(SpriteBundle {
                 texture: textures.enemy_ball.clone(),
