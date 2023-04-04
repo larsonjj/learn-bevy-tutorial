@@ -71,10 +71,8 @@ fn move_enemy_controller(
     mut enemy_query: Query<(&mut Enemy, &mut Velocity), With<Enemy>>,
 ) {
     for (enemy, mut enemy_controller_velocity) in &mut enemy_query {
-        enemy_controller_velocity.linvel = Vec2::new(
-            enemy.direction.x * ENEMY_SPEED * time.delta_seconds(),
-            enemy.direction.y * ENEMY_SPEED * time.delta_seconds(),
-        ) * ENEMY_SPEED
+        enemy_controller_velocity.linvel = Vec2::new(enemy.direction.x, enemy.direction.y)
+            * ENEMY_SPEED
             * time.delta_seconds()
             * 100.;
     }
@@ -91,7 +89,6 @@ fn check_for_collisions(
     rapier_context: Res<RapierContext>,
 ) {
     for event in collision_events.iter() {
-        println!("{:?}", event);
         match event {
             CollisionEvent::Started(a, b, _) => {
                 let enemy = if let Ok(a) = enemy_collider_query.get_mut(*a) {
@@ -111,7 +108,6 @@ fn check_for_collisions(
                 };
 
                 if enemy.is_some() && wall.is_some() {
-                    println!("Enemy hit wall");
                     let (enemy_entity, mut enemy, _) = enemy.unwrap();
 
                     if let Some(contact_pair) =
@@ -127,6 +123,7 @@ fn check_for_collisions(
                                 enemy.direction.y *= -1.;
                             }
                         }
+
                         if direction_changed {
                             direction_changed_event.send_default();
                         }
