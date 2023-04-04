@@ -1,6 +1,5 @@
 use crate::actions::Actions;
 use crate::loading::TextureAssets;
-use crate::physics::PLAY_AREA_BORDER_MARGIN;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -11,7 +10,7 @@ pub struct PlayerPlugin;
 #[derive(Component)]
 pub struct Player;
 
-const PLAYER_SPEED: f32 = 150.;
+const PLAYER_SPEED: f32 = 300.;
 const PLAYER_SIZE: f32 = 64.;
 
 /// This plugin handles player related stuff like movement
@@ -37,61 +36,26 @@ fn spawn_player(
             ..default()
         })
         .insert(Player)
-        .insert(RigidBody::KinematicPositionBased)
-        .insert(KinematicCharacterController::default())
+        .insert(RigidBody::Dynamic)
         .insert(Collider::ball(PLAYER_SIZE / 2.0))
+        .insert(Velocity::linear(Vec2::ZERO))
         .insert(GravityScale(0.0))
         .insert(LockedAxes::ROTATION_LOCKED)
         .insert(ActiveEvents::COLLISION_EVENTS);
 }
 
-fn move_player(
-    time: Res<Time>,
-    actions: Res<Actions>,
-    mut player_query: Query<&mut Transform, With<Player>>,
-) {
-    if actions.player_movement.is_none() {
-        return;
-    }
-
-    let speed = PLAYER_SPEED;
-    let movement = Vec3::new(
-        actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-        actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-        0.,
-    );
-    for mut player_transform in &mut player_query {
-        player_transform.translation += movement;
-    }
-}
-
 fn move_player_controller(
     time: Res<Time>,
     actions: Res<Actions>,
-    mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
+    mut player_query: Query<&mut Velocity, With<Player>>,
 ) {
-    if actions.player_movement.is_none() {
-        return;
-    }
-
-    let speed = PLAYER_SPEED;
-
-    for mut player_controller in &mut player_query {
-        // Print out player controller translation
-        println!(
-            "Player controller translation: {:?}",
-            player_controller.translation
-        );
-        player_controller.translation = match player_controller.translation {
-            Some(mut vector) => {
-                vector.x = actions.player_movement.unwrap().x * speed * time.delta_seconds();
-                vector.y = actions.player_movement.unwrap().y * speed * time.delta_seconds();
-                Some(vector)
-            }
-            None => Some(Vec2::new(
-                actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-                actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-            )),
+    for mut player_controller_velocity in &mut player_query {
+        if actions.player_movement.is_none() {
+            return player_controller_velocity.linvel = Vec2::ZERO;
         }
+        player_controller_velocity.linvel = Vec2::new(
+            actions.player_movement.unwrap().x * PLAYER_SPEED * time.delta_seconds(),
+            actions.player_movement.unwrap().y * PLAYER_SPEED * time.delta_seconds(),
+        ) * 100.;
     }
 }

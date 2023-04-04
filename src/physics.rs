@@ -15,8 +15,8 @@ impl Plugin for InternalPhysicsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
             .add_plugin(RapierDebugRenderPlugin::default())
-            .add_system(setup_play_area.in_schedule(OnEnter(GameState::Playing)));
-        // .add_system(display_collision_events.in_set(OnUpdate(GameState::Playing)));
+            .add_system(setup_play_area.in_schedule(OnEnter(GameState::Playing)))
+            .add_system(display_collision_events.in_set(OnUpdate(GameState::Playing)));
     }
 }
 

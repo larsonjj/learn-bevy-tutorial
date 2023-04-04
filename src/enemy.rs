@@ -1,12 +1,12 @@
 use crate::loading::TextureAssets;
-use crate::physics::PLAY_AREA_BORDER_MARGIN;
+use crate::physics::{PlayingAreaBorder, PLAY_AREA_BORDER_MARGIN};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use rand::prelude::*;
 
-const ENEMY_SPEED: f32 = 150.;
+const ENEMY_SPEED: f32 = 100.;
 const ENEMY_SIZE: f32 = 64.;
 const NUMBER_OF_ENEMIES: usize = 5;
 
@@ -24,8 +24,8 @@ impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<EnemyDirectionChangedEvent>()
             .add_system(spawn_enemies.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(update_enemy_movement.in_set(OnUpdate(GameState::Playing)))
-            .add_system(update_enemy_direction.in_set(OnUpdate(GameState::Playing)));
+            .add_system(move_enemy_controller.in_set(OnUpdate(GameState::Playing)))
+            .add_system(check_for_collisions.in_set(OnUpdate(GameState::Playing)));
     }
 }
 
@@ -37,8 +37,8 @@ fn spawn_enemies(
     let window = window_query.get_single().unwrap();
 
     for _ in 0..NUMBER_OF_ENEMIES {
-        let x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN);
-        let y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN);
+        let x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
+        let y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
         commands
             .spawn(SpriteBundle {
                 texture: textures.enemy_ball.clone(),
@@ -47,6 +47,10 @@ fn spawn_enemies(
             })
             .insert(Collider::ball(ENEMY_SIZE / 2.0))
             .insert(RigidBody::Dynamic)
+            .insert(Velocity::linear(Vec2::new(
+                random::<f32>() * 2. - 1.,
+                random::<f32>() * 2. - 1.,
+            )))
             .insert(GravityScale(0.0))
             .insert(LockedAxes::ROTATION_LOCKED)
             .insert(ActiveEvents::COLLISION_EVENTS)
@@ -56,53 +60,74 @@ fn spawn_enemies(
     }
 }
 
-pub fn update_enemy_movement(
+fn move_enemy_controller(
     time: Res<Time>,
-    mut enemy_query: Query<(&mut Enemy, &mut Transform), With<Enemy>>,
+    mut enemy_query: Query<(&mut Enemy, &mut Velocity), With<Enemy>>,
 ) {
-    for (enemy, mut enemy_transform) in &mut enemy_query {
-        let speed = ENEMY_SPEED;
-        let movement = Vec3::new(
-            enemy.direction.x * speed * time.delta_seconds(),
-            enemy.direction.y * speed * time.delta_seconds(),
-            0.,
-        );
-        enemy_transform.translation += movement;
+    for (enemy, mut enemy_controller_velocity) in &mut enemy_query {
+        enemy_controller_velocity.linvel = Vec2::new(
+            enemy.direction.x * ENEMY_SPEED * time.delta_seconds(),
+            enemy.direction.y * ENEMY_SPEED * time.delta_seconds(),
+        ) * ENEMY_SPEED
+            * time.delta_seconds()
+            * 100.;
     }
 }
 
-// Flip the enemy's direction if it hits the window's edge
-pub fn update_enemy_direction(
-    mut enemy_query: Query<(&mut Enemy, &mut Transform), With<Enemy>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
+fn check_for_collisions(
+    mut enemy_collider_query: Query<
+        (Entity, &mut Enemy, &mut Velocity),
+        (With<Collider>, With<Enemy>),
+    >,
+    mut wall_collider_query: Query<Entity, (With<Collider>, With<PlayingAreaBorder>)>,
+    mut collision_events: EventReader<CollisionEvent>,
     mut direction_changed_event: EventWriter<EnemyDirectionChangedEvent>,
+    rapier_context: Res<RapierContext>,
 ) {
-    let window = window_query.get_single().unwrap();
+    for event in collision_events.iter() {
+        println!("{:?}", event);
+        match event {
+            CollisionEvent::Started(a, b, _) => {
+                let enemy = if let Ok(a) = enemy_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = enemy_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
 
-    let half_enemy_size = ENEMY_SIZE / 2.;
-    let x_min = 0.0 + half_enemy_size;
-    let x_max = window.width() - half_enemy_size;
-    let y_min = 0.0 + half_enemy_size;
-    let y_max = window.height() - half_enemy_size;
+                let mut wall = if let Ok(a) = wall_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = wall_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
 
-    for (mut enemy, enemy_transform) in enemy_query.iter_mut() {
-        let mut direction_changed = false;
+                if enemy.is_some() && wall.is_some() {
+                    println!("Enemy hit wall");
+                    let (enemy_entity, mut enemy, _) = enemy.unwrap();
 
-        let translation = enemy_transform.translation;
-
-        if translation.x < x_min || translation.x > x_max {
-            enemy.direction.x *= -1.;
-            direction_changed = true;
-        }
-
-        if translation.y < y_min || translation.y > y_max {
-            enemy.direction.y *= -1.;
-            direction_changed = true;
-        }
-
-        // Play sound effect if direction changed
-        if direction_changed {
-            direction_changed_event.send_default();
+                    if let Some(contact_pair) =
+                        rapier_context.contact_pair(enemy_entity, wall.unwrap())
+                    {
+                        let mut direction_changed = false;
+                        for manifold in contact_pair.manifolds() {
+                            if manifold.local_n1().x == 1. || manifold.local_n1().x == -1. {
+                                direction_changed = true;
+                                enemy.direction.x *= -1.;
+                            } else if manifold.local_n1().y == 1. || manifold.local_n1().y == -1. {
+                                direction_changed = true;
+                                enemy.direction.y *= -1.;
+                            }
+                        }
+                        if direction_changed {
+                            direction_changed_event.send_default();
+                        }
+                    }
+                }
+            }
+            CollisionEvent::Stopped(_, _, _) => {}
         }
     }
 }
