@@ -96,7 +96,7 @@ fn check_for_collisions(
                     None
                 };
 
-                let mut wall = if let Ok(a) = wall_collider_query.get_mut(*a) {
+                let wall = if let Ok(a) = wall_collider_query.get_mut(*a) {
                     Some(a)
                 } else if let Ok(b) = wall_collider_query.get_mut(*b) {
                     Some(b)
