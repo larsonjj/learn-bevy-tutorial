@@ -5,6 +5,8 @@ use crate::GameState;
 
 pub const PLAY_AREA_BORDER_MARGIN: f32 = 5.0;
 
+type RapierPlugin = RapierPhysicsPlugin<NoUserData>;
+
 pub struct InternalPhysicsPlugin;
 
 #[derive(Component)]
@@ -13,8 +15,22 @@ pub struct PlayingAreaBorder;
 // Bevy Plugin for handling rapier physics
 impl Plugin for InternalPhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-            .add_plugin(RapierDebugRenderPlugin::default())
+        let rapier_config = RapierConfiguration {
+            gravity: Vec2::ZERO,
+            // timestep_mode: TimestepMode::Fixed {
+            //     dt: PHYSICS_TIMESTEP,
+            //     substeps: 1,
+            // },
+            ..default()
+        };
+
+        app.insert_resource(rapier_config)
+            .add_plugin(RapierPlugin::pixels_per_meter(100.))
+            .add_plugin(RapierDebugRenderPlugin {
+                always_on_top: true,
+                enabled: true,
+                ..default()
+            })
             .add_system(setup_play_area.in_schedule(OnEnter(GameState::Playing)))
             .add_system(display_collision_events.in_set(OnUpdate(GameState::Playing)));
     }
@@ -48,7 +64,6 @@ fn setup_play_area(mut commands: Commands, window_query: Query<&Window, With<Pri
             ],
             Some(vec![[0, 1], [1, 2], [2, 3], [3, 0]]),
         ))
-        .insert(ActiveEvents::COLLISION_EVENTS)
         .insert(PlayingAreaBorder);
 }
 
