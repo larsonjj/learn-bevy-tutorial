@@ -1,7 +1,7 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
 
-use crate::{actions::Actions, star::StarPickupEvent, GameState};
+use crate::{actions::resources::Actions, star::StarPickupEvent, GameState};
 
 pub struct StatePlugin;
 

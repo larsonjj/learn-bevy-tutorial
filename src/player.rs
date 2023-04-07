@@ -1,4 +1,4 @@
-use crate::actions::Actions;
+use crate::actions::resources::Actions;
 use crate::enemy::Enemy;
 use crate::loading::TextureAssets;
 use crate::state::{GameOverEvent, Score};

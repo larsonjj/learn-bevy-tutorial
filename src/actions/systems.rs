@@ -1,4 +1,6 @@
-use bevy::prelude::{Input, KeyCode, Res};
+use bevy::prelude::*;
+
+use super::resources::*;
 
 pub enum GameControl {
     Up,
@@ -33,5 +35,26 @@ pub fn get_movement(control: GameControl, input: &Res<Input<KeyCode>>) -> f32 {
         1.0
     } else {
         0.0
+    }
+}
+
+pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
+    let player_movement = Vec2::new(
+        get_movement(GameControl::Right, &keyboard_input)
+            - get_movement(GameControl::Left, &keyboard_input),
+        get_movement(GameControl::Up, &keyboard_input)
+            - get_movement(GameControl::Down, &keyboard_input),
+    );
+
+    if player_movement != Vec2::ZERO {
+        actions.player_movement = Some(player_movement.normalize());
+    } else {
+        actions.player_movement = None;
+    }
+}
+
+pub fn handle_escape(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
+    if (GameControl::Escape.pressed(&keyboard_input)) {
+        actions.exit_game = true;
     }
 }
