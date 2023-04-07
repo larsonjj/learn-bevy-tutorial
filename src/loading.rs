@@ -36,9 +36,9 @@ pub struct AudioAssets {
     #[asset(path = "audio/chosic/fluffing_a_duck.ogg")]
     pub background_music: Handle<AudioSource>,
     #[asset(path = "audio/kenney/interface/pluck_001.ogg")]
-    pub enemy_direction_changed_1: Handle<AudioSource>,
+    pub enemy_hit_wall_1: Handle<AudioSource>,
     #[asset(path = "audio/kenney/interface/pluck_002.ogg")]
-    pub enemy_direction_changed_2: Handle<AudioSource>,
+    pub enemy_hit_wall_2: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

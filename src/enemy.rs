@@ -1,5 +1,5 @@
 use crate::loading::TextureAssets;
-use crate::physics::PLAY_AREA_BORDER_MARGIN;
+use crate::physics::{PlayingAreaBorder, PLAY_AREA_BORDER_MARGIN};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -16,13 +16,14 @@ pub struct EnemyPlugin;
 pub struct Enemy;
 
 #[derive(Default)]
-pub struct EnemyDirectionChangedEvent;
+pub struct EnemyHitWallEvent;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<EnemyDirectionChangedEvent>()
+        app.add_event::<EnemyHitWallEvent>()
             .add_system(spawn_enemies.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(move_enemy_controller.in_set(OnUpdate(GameState::Playing)));
+            .add_system(move_enemy_controller.in_set(OnUpdate(GameState::Playing)))
+            .add_system(check_for_world_collisions.in_set(OnUpdate(GameState::Playing)));
         // .add_system(detect_collisions.in_set(OnUpdate(GameState::Playing)));
     }
 }
@@ -57,7 +58,6 @@ fn spawn_enemies(
             })
             .insert(GravityScale(0.0))
             .insert(LockedAxes::ROTATION_LOCKED)
-            // .insert(ColliderMassProperties::Density(1.0))
             .insert(ActiveEvents::COLLISION_EVENTS)
             .insert(Enemy);
     }
@@ -70,12 +70,51 @@ fn move_enemy_controller(mut enemy_query: Query<&mut Velocity, With<Enemy>>) {
     }
 }
 
+fn check_for_world_collisions(
+    mut commands: Commands,
+    mut enemy_collider_query: Query<(Entity, &mut Enemy), (With<Collider>, With<Enemy>)>,
+    mut wall_collider_query: Query<
+        (Entity, &PlayingAreaBorder),
+        (With<Collider>, With<PlayingAreaBorder>),
+    >,
+    mut collision_events: EventReader<CollisionEvent>,
+    mut enemy_hit_wall_event: EventWriter<EnemyHitWallEvent>,
+) {
+    for event in collision_events.iter() {
+        match event {
+            CollisionEvent::Started(a, b, _) => {
+                let enemy = if let Ok(a) = enemy_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = enemy_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
+
+                let wall = if let Ok(a) = wall_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = wall_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
+
+                if enemy.is_some() && wall.is_some() {
+                    // Enemy collided with wall
+                    enemy_hit_wall_event.send_default();
+                }
+            }
+            CollisionEvent::Stopped(_, _, _) => {}
+        }
+    }
+}
+
 // fn detect_collisions(
 //     mut character_controller_outputs: Query<
 //         (&mut Enemy, &mut KinematicCharacterControllerOutput),
 //         With<Enemy>,
 //     >,
-//     mut direction_changed_event: EventWriter<EnemyDirectionChangedEvent>,
+//     mut enemy_hit_wall_event: EventWriter<EnemyHitWallEvent>,
 // ) {
 //     for (mut enemy, mut output) in character_controller_outputs.iter_mut() {
 //         for collision in &output.collisions {
@@ -89,7 +128,7 @@ fn move_enemy_controller(mut enemy_query: Query<&mut Velocity, With<Enemy>>) {
 //             }
 //             println!("Direction {:?}", enemy.direction)
 //             // if direction_changed {
-//             //     direction_changed_event.send_default();
+//             //     enemy_hit_wall_event.send_default();
 //             // }
 //         }
 //     }
