@@ -1,6 +1,7 @@
 use crate::actions::Actions;
 use crate::enemy::Enemy;
 use crate::loading::TextureAssets;
+use crate::star::Star;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -24,6 +25,7 @@ impl Plugin for PlayerPlugin {
         app.add_event::<PlayerDiedEvent>()
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
             .add_system(move_player_controller.in_set(OnUpdate(GameState::Playing)))
+            // .add_system(detect_collisions.in_set(OnUpdate(GameState::Playing)))
             .add_system(check_for_world_collisions.in_set(OnUpdate(GameState::Playing)));
     }
 }
@@ -45,6 +47,7 @@ fn spawn_player(
         // .insert(RigidBody::KinematicPositionBased)
         .insert(KinematicCharacterController {
             slide: true,
+            filter_flags: QueryFilterFlags::EXCLUDE_SENSORS,
             ..default()
         })
         .insert(Collider::ball(PLAYER_SIZE / 2.0))
@@ -84,13 +87,17 @@ fn move_player_controller(
 //         (&mut KinematicCharacterControllerOutput, Entity),
 //         With<Player>,
 //     >,
-//     mut enemy_query: Query<&mut Enemy>,
+//     mut star_query: Query<&mut Star>,
 // ) {
 //     for (player_controller, player) in character_controller_query.iter() {
 //         for collision in &player_controller.collisions {
-//             if let Ok(selected_enemy) = enemy_query.get(collision.entity) {
-//                 println!("Player collided with enemy: {:?}", selected_enemy);
-//                 commands.entity(player).despawn();
+//             //print out collision info
+//             println!(
+//                 "Player collided with entity: {:?} at {:?}",
+//                 collision.entity, collision.character_translation
+//             );
+//             if let Ok(selected_star) = star_query.get(collision.entity) {
+//                 println!("Player collided with star: {:?}", selected_star);
 //             }
 //         }
 //     }
