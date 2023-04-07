@@ -12,6 +12,7 @@ pub struct ActionsPlugin;
 impl Plugin for ActionsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Actions>()
+            .add_system(handle_escape)
             .add_system(set_movement_actions.in_set(OnUpdate(GameState::Playing)));
     }
 }
@@ -19,6 +20,7 @@ impl Plugin for ActionsPlugin {
 #[derive(Default, Resource)]
 pub struct Actions {
     pub player_movement: Option<Vec2>,
+    pub exit_game: bool,
 }
 
 pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
@@ -33,5 +35,11 @@ pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<In
         actions.player_movement = Some(player_movement.normalize());
     } else {
         actions.player_movement = None;
+    }
+}
+
+pub fn handle_escape(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
+    if (GameControl::Escape.pressed(&keyboard_input)) {
+        actions.exit_game = true;
     }
 }

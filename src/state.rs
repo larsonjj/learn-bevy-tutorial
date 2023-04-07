@@ -1,6 +1,7 @@
+use bevy::app::AppExit;
 use bevy::prelude::*;
 
-use crate::{star::StarPickupEvent, GameState};
+use crate::{actions::Actions, star::StarPickupEvent, GameState};
 
 pub struct StatePlugin;
 
@@ -19,6 +20,7 @@ impl Plugin for StatePlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Score>()
             .add_system(update_score)
+            .add_system(control_game_exit_event)
             .add_system(control_star_pickup_event.in_set(OnUpdate(GameState::Playing)));
     }
 }
@@ -34,10 +36,15 @@ fn control_star_pickup_event(
     mut score: ResMut<Score>,
 ) {
     if !star_pickup_events.is_empty() {
-        println!("Star picked up!");
         // This prevents events staying active on the next frame.
         star_pickup_events.clear();
 
         score.value += 1;
+    }
+}
+
+fn control_game_exit_event(actions: Res<Actions>, mut app_exit_events: EventWriter<AppExit>) {
+    if actions.exit_game {
+        app_exit_events.send(AppExit);
     }
 }
