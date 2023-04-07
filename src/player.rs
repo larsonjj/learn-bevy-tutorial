@@ -1,7 +1,7 @@
 use crate::actions::Actions;
 use crate::enemy::Enemy;
 use crate::loading::TextureAssets;
-use crate::star::Star;
+use crate::state::{GameOverEvent, Score};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -109,6 +109,8 @@ fn check_for_world_collisions(
     mut player_collider_query: Query<(Entity, &Player), (With<Collider>, With<Player>)>,
     mut collision_events: EventReader<CollisionEvent>,
     mut player_died_event: EventWriter<PlayerDiedEvent>,
+    mut game_over_event: EventWriter<GameOverEvent>,
+    score: Res<Score>,
 ) {
     for event in collision_events.iter() {
         match event {
@@ -132,6 +134,8 @@ fn check_for_world_collisions(
                 if enemy.is_some() && player.is_some() {
                     // Play death sound
                     player_died_event.send_default();
+                    // Send Game Over
+                    game_over_event.send(GameOverEvent { score: score.value });
                     // Despawn the player
                     commands.entity(player.unwrap().0).despawn();
                 }
