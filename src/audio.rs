@@ -1,4 +1,4 @@
-use crate::enemy::EnemyDirectionChangedEvent;
+use crate::enemy::EnemyHitWallEvent;
 use crate::loading::AudioAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -9,7 +9,7 @@ pub struct InternalAudioPlugin;
 impl Plugin for InternalAudioPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(start_audio.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(control_enemy_direction_changed_sound.in_set(OnUpdate(GameState::Playing)));
+            .add_system(control_enemy_wall_hit_sound.in_set(OnUpdate(GameState::Playing)));
     }
 }
 
@@ -26,20 +26,20 @@ fn start_audio(audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
     );
 }
 
-fn control_enemy_direction_changed_sound(
+fn control_enemy_wall_hit_sound(
     audio_assets: Res<AudioAssets>,
     audio: Res<Audio>,
-    mut enemy_direction_changed_events: EventReader<EnemyDirectionChangedEvent>,
+    mut enemy_hit_wall_events: EventReader<EnemyHitWallEvent>,
 ) {
-    if !enemy_direction_changed_events.is_empty() {
+    if !enemy_hit_wall_events.is_empty() {
         // This prevents events staying active on the next frame.
-        enemy_direction_changed_events.clear();
+        enemy_hit_wall_events.clear();
 
         // Randomely play one of the two sounds
         let sound_effect = if rand::random() {
-            audio_assets.enemy_direction_changed_1.clone()
+            audio_assets.enemy_hit_wall_1.clone()
         } else {
-            audio_assets.enemy_direction_changed_2.clone()
+            audio_assets.enemy_hit_wall_2.clone()
         };
         audio.play_with_settings(
             sound_effect,
