@@ -16,11 +16,18 @@ impl Default for Score {
     }
 }
 
+#[derive(Default)]
+pub struct GameOverEvent {
+    pub score: u32,
+}
+
 impl Plugin for StatePlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<Score>()
+        app.add_event::<GameOverEvent>()
+            .init_resource::<Score>()
             .add_system(update_score)
             .add_system(control_game_exit_event)
+            .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Playing)))
             .add_system(control_star_pickup_event.in_set(OnUpdate(GameState::Playing)));
     }
 }
@@ -46,5 +53,13 @@ fn control_star_pickup_event(
 fn control_game_exit_event(actions: Res<Actions>, mut app_exit_events: EventWriter<AppExit>) {
     if actions.exit_game {
         app_exit_events.send(AppExit);
+    }
+}
+
+fn handle_game_over_event(mut game_over_events: EventReader<GameOverEvent>) {
+    if !game_over_events.is_empty() {
+        for event in game_over_events.iter() {
+            println!("Game Over! Score: {}", event.score);
+        }
     }
 }
