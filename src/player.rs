@@ -11,6 +11,9 @@ pub struct PlayerPlugin;
 #[derive(Component)]
 pub struct Player;
 
+#[derive(Default)]
+pub struct PlayerDiedEvent;
+
 const PLAYER_SPEED: f32 = 300.;
 const PLAYER_SIZE: f32 = 64.;
 
@@ -18,7 +21,8 @@ const PLAYER_SIZE: f32 = 64.;
 /// Player logic is only active during the State `GameState::Playing`
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
+        app.add_event::<PlayerDiedEvent>()
+            .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
             .add_system(move_player_controller.in_set(OnUpdate(GameState::Playing)))
             .add_system(check_for_world_collisions.in_set(OnUpdate(GameState::Playing)));
     }
@@ -97,6 +101,7 @@ fn check_for_world_collisions(
     mut enemy_collider_query: Query<(Entity, &mut Enemy), (With<Collider>, With<Enemy>)>,
     mut player_collider_query: Query<(Entity, &Player), (With<Collider>, With<Player>)>,
     mut collision_events: EventReader<CollisionEvent>,
+    mut player_died_event: EventWriter<PlayerDiedEvent>,
 ) {
     for event in collision_events.iter() {
         match event {
@@ -118,6 +123,8 @@ fn check_for_world_collisions(
                 };
 
                 if enemy.is_some() && player.is_some() {
+                    // Play death sound
+                    player_died_event.send_default();
                     // Despawn the player
                     commands.entity(player.unwrap().0).despawn();
                 }
