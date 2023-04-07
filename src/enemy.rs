@@ -36,8 +36,8 @@ fn spawn_enemies(
     let window = window_query.get_single().unwrap();
 
     for _ in 0..NUMBER_OF_ENEMIES {
-        let random_x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN);
-        let random_y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN);
+        let random_x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
+        let random_y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
         let velocity = Vec2::new(random::<f32>(), random::<f32>()).normalize() * ENEMY_SPEED;
         commands
             .spawn(SpriteBundle {

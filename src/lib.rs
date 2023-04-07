@@ -6,6 +6,8 @@ mod loading;
 mod menu;
 mod physics;
 mod player;
+mod star;
+mod state;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -15,6 +17,8 @@ use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::physics::InternalPhysicsPlugin;
 use crate::player::PlayerPlugin;
+use crate::star::StarPlugin;
+use crate::state::StatePlugin;
 
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
@@ -44,8 +48,10 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(InternalPhysicsPlugin)
+            .add_plugin(StatePlugin)
             .add_plugin(MenuPlugin)
             .add_plugin(PlayerPlugin)
+            .add_plugin(StarPlugin)
             .add_plugin(EnemyPlugin);
 
         #[cfg(debug_assertions)]

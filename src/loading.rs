@@ -41,6 +41,8 @@ pub struct AudioAssets {
     pub enemy_hit_wall_2: Handle<AudioSource>,
     #[asset(path = "audio/kenney/sci_fi/explosionCrunch_000.ogg")]
     pub player_died: Handle<AudioSource>,
+    #[asset(path = "audio/kenney/impact/impactMetal_heavy_001.ogg")]
+    pub star_pickup: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]
