@@ -8,16 +8,17 @@ mod star;
 mod systems;
 pub mod walls;
 
+use crate::states::GameState;
 use audio::GameAudioPlugin;
+use bevy::prelude::*;
 use enemy::EnemyPlugin;
 use events::*;
 use physics::GamePhysicsPlugin;
 use player::PlayerPlugin;
 use resources::*;
 use star::StarPlugin;
+use systems::*;
 use walls::WallsPlugin;
-
-use bevy::prelude::*;
 
 pub struct GamePlugin;
 
@@ -30,9 +31,8 @@ impl Plugin for GamePlugin {
             .add_plugin(PlayerPlugin)
             .add_plugin(StarPlugin)
             .add_plugin(EnemyPlugin)
-            .add_plugin(WallsPlugin);
-        // .add_system(control_game_exit_event)
-        // .add_system(update_score.in_set(OnUpdate(GameState::Game)))
-        // .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Game)));
+            .add_plugin(WallsPlugin)
+            .add_system(update_score.in_set(OnUpdate(GameState::Game)))
+            .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Game)));
     }
 }

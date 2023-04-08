@@ -22,16 +22,16 @@ impl Plugin for GamePhysicsPlugin {
         };
 
         app.insert_resource(rapier_config)
-            .add_plugin(RapierPlugin::pixels_per_meter(100.))
-            .add_plugin(RapierDebugRenderPlugin {
+            .add_plugin(RapierPlugin::pixels_per_meter(100.));
+
+        #[cfg(debug_assertions)]
+        {
+            app.add_plugin(RapierDebugRenderPlugin {
                 always_on_top: true,
                 enabled: true,
                 ..default()
             });
-
-        #[cfg(debug_assertions)]
-        {
-            // app.add_system(display_collision_events.in_set(OnUpdate(GameState::Game)));
+            //.add_system(display_collision_events.in_set(OnUpdate(GameState::Game)));
         }
     }
 }
