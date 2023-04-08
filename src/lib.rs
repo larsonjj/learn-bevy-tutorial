@@ -4,7 +4,7 @@ mod audio;
 mod camera;
 mod enemy;
 mod events;
-mod menu;
+mod main_menu;
 mod physics;
 mod player;
 mod resources;
@@ -19,7 +19,7 @@ use crate::audio::InternalAudioPlugin;
 use crate::camera::CameraPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::events::*;
-use crate::menu::MenuPlugin;
+use crate::main_menu::MainMenuPlugin;
 use crate::physics::InternalPhysicsPlugin;
 use crate::player::PlayerPlugin;
 use crate::resources::*;
@@ -44,7 +44,7 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(InternalPhysicsPlugin)
-            .add_plugin(MenuPlugin)
+            .add_plugin(MainMenuPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(StarPlugin)
             .add_plugin(EnemyPlugin)

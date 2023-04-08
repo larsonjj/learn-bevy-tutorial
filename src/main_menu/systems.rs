@@ -1,33 +1,6 @@
+use super::resources::*;
 use crate::{asset_loader::resources::FontAssets, GameState};
 use bevy::prelude::*;
-
-pub struct MenuPlugin;
-
-/// This plugin is responsible for the game menu (containing only one button...)
-/// The menu is only drawn during the State `GameState::Menu` and is removed when that state is exited
-impl Plugin for MenuPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<ButtonColors>()
-            .add_system(setup_menu.in_schedule(OnEnter(GameState::Menu)))
-            .add_system(click_play_button.in_set(OnUpdate(GameState::Menu)))
-            .add_system(cleanup_menu.in_schedule(OnExit(GameState::Menu)));
-    }
-}
-
-#[derive(Resource)]
-pub struct ButtonColors {
-    normal: Color,
-    hovered: Color,
-}
-
-impl Default for ButtonColors {
-    fn default() -> Self {
-        ButtonColors {
-            normal: Color::rgb(0.15, 0.15, 0.15),
-            hovered: Color::rgb(0.25, 0.25, 0.25),
-        }
-    }
-}
 
 pub fn setup_menu(
     mut commands: Commands,
@@ -58,7 +31,7 @@ pub fn setup_menu(
         });
 }
 
-fn click_play_button(
+pub fn click_play_button(
     button_colors: Res<ButtonColors>,
     mut state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<
@@ -81,6 +54,6 @@ fn click_play_button(
     }
 }
 
-fn cleanup_menu(mut commands: Commands, button: Query<Entity, With<Button>>) {
+pub fn cleanup_menu(mut commands: Commands, button: Query<Entity, With<Button>>) {
     commands.entity(button.single()).despawn_recursive();
 }
