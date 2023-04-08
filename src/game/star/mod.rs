@@ -1,4 +1,4 @@
-use crate::states::GameState;
+use crate::states::AppState;
 use bevy::prelude::*;
 
 pub mod components;
@@ -16,7 +16,7 @@ pub struct StarPlugin;
 impl Plugin for StarPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<StarSpawnTimer>()
-            .add_system(tick_star_spawn_timer.in_set(OnUpdate(GameState::Game)))
-            .add_system(spawn_stars_over_time.in_set(OnUpdate(GameState::Game)));
+            .add_system(tick_star_spawn_timer.in_set(OnUpdate(AppState::Game)))
+            .add_system(spawn_stars_over_time.in_set(OnUpdate(AppState::Game)));
     }
 }

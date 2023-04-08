@@ -17,7 +17,7 @@ use bevy::DefaultPlugins;
 use camera::CameraPlugin;
 use game::GamePlugin;
 use main_menu::MainMenuPlugin;
-use states::GameState;
+use states::AppState;
 use systems::*;
 
 fn main() {
@@ -25,7 +25,7 @@ fn main() {
 
     let app = binding
         // Bevy
-        .add_state::<GameState>()
+        .add_state::<AppState>()
         .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
         .add_plugins(DefaultPlugins.set(WindowPlugin {

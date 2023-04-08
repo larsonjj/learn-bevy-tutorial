@@ -1,4 +1,4 @@
-use crate::states::GameState;
+use crate::states::AppState;
 use bevy::prelude::*;
 
 pub mod components;
@@ -12,6 +12,6 @@ pub struct WallsPlugin;
 
 impl Plugin for WallsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_walls.in_schedule(OnEnter(GameState::Game)));
+        app.add_system(spawn_walls.in_schedule(OnEnter(AppState::Game)));
     }
 }

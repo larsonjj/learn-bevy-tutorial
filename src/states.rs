@@ -4,7 +4,7 @@ use bevy::prelude::*;
 // See https://bevy-cheatbook.github.io/programming/states.html
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
-pub enum GameState {
+pub enum AppState {
     // During the loading State the AssetLoaderPlugin will load our assets
     #[default]
     Loading,
@@ -12,4 +12,6 @@ pub enum GameState {
     Game,
     // Here the menu is drawn and waiting for player interaction
     MainMenu,
+    // During this state, the game over screen is displayed
+    GameOver,
 }

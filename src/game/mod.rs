@@ -5,10 +5,11 @@ mod physics;
 mod player;
 mod resources;
 mod star;
+mod states;
 mod systems;
 pub mod walls;
 
-use crate::states::GameState;
+use crate::states::AppState;
 use audio::GameAudioPlugin;
 use bevy::prelude::*;
 use enemy::EnemyPlugin;
@@ -17,6 +18,7 @@ use physics::GamePhysicsPlugin;
 use player::PlayerPlugin;
 use resources::*;
 use star::StarPlugin;
+use states::*;
 use systems::*;
 use walls::WallsPlugin;
 
@@ -25,14 +27,18 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<GameOverEvent>()
+            .add_state::<SimulationState>()
             .init_resource::<Score>()
+            .add_system(pause_simulation.in_schedule(OnEnter(AppState::Game)))
             .add_plugin(GameAudioPlugin)
             .add_plugin(GamePhysicsPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(StarPlugin)
             .add_plugin(EnemyPlugin)
             .add_plugin(WallsPlugin)
-            .add_system(update_score.in_set(OnUpdate(GameState::Game)))
-            .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Game)));
+            .add_system(update_score.in_set(OnUpdate(AppState::Game)))
+            .add_system(handle_game_over_event.in_set(OnUpdate(AppState::Game)))
+            .add_system(toggle_simulation.run_if(in_state(AppState::Game)))
+            .add_system(resume_simulation.in_schedule(OnExit(AppState::Game)));
     }
 }
