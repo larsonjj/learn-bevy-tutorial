@@ -1,7 +1,6 @@
 use super::components::*;
 use super::resources::*;
 use super::STAR_SIZE;
-use crate::game::walls::WALLS_MARGIN;
 use crate::loading::resources::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -20,8 +19,8 @@ pub fn spawn_stars_over_time(
 ) {
     if star_spawn_timer.timer.finished() {
         let window = window_query.get_single().unwrap();
-        let random_x = random::<f32>() * (window.width() - WALLS_MARGIN - STAR_SIZE);
-        let random_y = random::<f32>() * (window.height() - WALLS_MARGIN - STAR_SIZE);
+        let random_x = random::<f32>() * (window.width() - STAR_SIZE);
+        let random_y = random::<f32>() * (window.height() - STAR_SIZE);
 
         commands
             .spawn(SpriteBundle {
