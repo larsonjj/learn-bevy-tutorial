@@ -5,6 +5,10 @@ mod systems;
 
 use systems::*;
 
+use crate::states::AppState;
+
+use super::states::SimulationState;
+
 type RapierPlugin = RapierPhysicsPlugin<NoUserData>;
 
 pub struct GamePhysicsPlugin;
@@ -22,7 +26,17 @@ impl Plugin for GamePhysicsPlugin {
         };
 
         app.insert_resource(rapier_config)
-            .add_plugin(RapierPlugin::pixels_per_meter(100.));
+            .add_plugin(RapierPlugin::pixels_per_meter(100.))
+            .add_system(
+                run_simulation
+                    .in_set(OnUpdate(AppState::Game))
+                    .in_set(OnUpdate(SimulationState::Running)),
+            )
+            .add_system(
+                pause_simulation
+                    .in_set(OnUpdate(AppState::Game))
+                    .in_set(OnUpdate(SimulationState::Paused)),
+            );
 
         #[cfg(debug_assertions)]
         {

@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+// See https://bevy-cheatbook.github.io/programming/states.html
+// Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
+#[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum SimulationState {
     #[default]
     Running,
