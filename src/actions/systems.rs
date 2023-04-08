@@ -54,7 +54,7 @@ pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<In
 }
 
 pub fn handle_escape(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
-    if (GameControl::Escape.pressed(&keyboard_input)) {
+    if GameControl::Escape.pressed(&keyboard_input) {
         actions.exit_game = true;
     }
 }

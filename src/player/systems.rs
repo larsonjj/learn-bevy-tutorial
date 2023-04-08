@@ -1,36 +1,19 @@
+use super::components::*;
+use super::events::*;
 use crate::actions::resources::Actions;
-use crate::enemy::Enemy;
-use crate::loading::TextureAssets;
-use crate::state::{GameOverEvent, Score};
-use crate::GameState;
+use crate::asset_loader::resources::*;
+use crate::enemy::components::Enemy;
+use crate::events::GameOverEvent;
+use crate::resources::Score;
+use crate::star::components::Star;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 
-pub struct PlayerPlugin;
-
-#[derive(Component)]
-pub struct Player;
-
-#[derive(Default)]
-pub struct PlayerDiedEvent;
-
 const PLAYER_SPEED: f32 = 300.;
 const PLAYER_SIZE: f32 = 64.;
 
-/// This plugin handles player related stuff like movement
-/// Player logic is only active during the State `GameState::Playing`
-impl Plugin for PlayerPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_event::<PlayerDiedEvent>()
-            .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(move_player_controller.in_set(OnUpdate(GameState::Playing)))
-            // .add_system(detect_collisions.in_set(OnUpdate(GameState::Playing)))
-            .add_system(check_for_world_collisions.in_set(OnUpdate(GameState::Playing)));
-    }
-}
-
-fn spawn_player(
+pub fn spawn_player(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -44,7 +27,6 @@ fn spawn_player(
             ..default()
         })
         .insert(Player)
-        // .insert(RigidBody::KinematicPositionBased)
         .insert(KinematicCharacterController {
             slide: true,
             filter_flags: QueryFilterFlags::EXCLUDE_SENSORS,
@@ -63,7 +45,7 @@ fn spawn_player(
         .insert(ActiveEvents::COLLISION_EVENTS);
 }
 
-fn move_player_controller(
+pub fn move_player_controller(
     time: Res<Time>,
     actions: Res<Actions>,
     mut player_query: Query<&mut KinematicCharacterController, With<Player>>,
@@ -80,49 +62,20 @@ fn move_player_controller(
     }
 }
 
-// Detects when player collides with another collider (ONLY DETECTS WHILE MOVING)
-// fn detect_collisions(
-//     mut commands: Commands,
-//     mut character_controller_query: Query<
-//         (&mut KinematicCharacterControllerOutput, Entity),
-//         With<Player>,
-//     >,
-//     mut star_query: Query<&mut Star>,
-// ) {
-//     for (player_controller, player) in character_controller_query.iter() {
-//         for collision in &player_controller.collisions {
-//             //print out collision info
-//             println!(
-//                 "Player collided with entity: {:?} at {:?}",
-//                 collision.entity, collision.character_translation
-//             );
-//             if let Ok(selected_star) = star_query.get(collision.entity) {
-//                 println!("Player collided with star: {:?}", selected_star);
-//             }
-//         }
-//     }
-// }
-
-fn check_for_world_collisions(
+pub fn check_for_world_collisions(
     mut commands: Commands,
     mut enemy_collider_query: Query<(Entity, &mut Enemy), (With<Collider>, With<Enemy>)>,
     mut player_collider_query: Query<(Entity, &Player), (With<Collider>, With<Player>)>,
+    mut star_collider_query: Query<(Entity, &Star), (With<Collider>, With<Star>)>,
     mut collision_events: EventReader<CollisionEvent>,
-    mut player_died_event: EventWriter<PlayerDiedEvent>,
+    mut player_died_event: EventWriter<PlayerHitEnemyEvent>,
     mut game_over_event: EventWriter<GameOverEvent>,
-    score: Res<Score>,
+    mut star_pickup_event: EventWriter<PlayerStarPickupEvent>,
+    mut score: ResMut<Score>,
 ) {
     for event in collision_events.iter() {
         match event {
             CollisionEvent::Started(a, b, _) => {
-                let enemy = if let Ok(a) = enemy_collider_query.get_mut(*a) {
-                    Some(a)
-                } else if let Ok(b) = enemy_collider_query.get_mut(*b) {
-                    Some(b)
-                } else {
-                    None
-                };
-
                 let player = if let Ok(a) = player_collider_query.get_mut(*a) {
                     Some(a)
                 } else if let Ok(b) = player_collider_query.get_mut(*b) {
@@ -131,16 +84,83 @@ fn check_for_world_collisions(
                     None
                 };
 
+                let enemy = if let Ok(a) = enemy_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = enemy_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
+
+                let star = if let Ok(a) = star_collider_query.get_mut(*a) {
+                    Some(a)
+                } else if let Ok(b) = star_collider_query.get_mut(*b) {
+                    Some(b)
+                } else {
+                    None
+                };
+
                 if enemy.is_some() && player.is_some() {
-                    // Play death sound
+                    // Send player died event
                     player_died_event.send_default();
-                    // Send Game Over
-                    game_over_event.send(GameOverEvent { score: score.value });
+
+                    // Send game over event
+                    game_over_event.send_default();
+
                     // Despawn the player
                     commands.entity(player.unwrap().0).despawn();
+                } else if player.is_some() && star.is_some() {
+                    // Send star pickup event
+                    star_pickup_event.send_default();
+
+                    // Increment score
+                    score.value += 1;
+
+                    // Despawn the star
+                    commands.entity(star.unwrap().0).despawn();
                 }
             }
             CollisionEvent::Stopped(_, _, _) => {}
         }
+    }
+}
+
+pub fn play_player_hit_enemy_sound(
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
+    mut player_died_events: EventReader<PlayerHitEnemyEvent>,
+) {
+    if !player_died_events.is_empty() {
+        // This prevents events staying active on the next frame.
+        player_died_events.clear();
+
+        // Randomely play one of the two sounds
+        audio.play_with_settings(
+            audio_assets.player_died.clone(),
+            PlaybackSettings {
+                volume: 0.5,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+pub fn play_star_pickup_sound(
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
+    mut star_pickup_events: EventReader<PlayerStarPickupEvent>,
+) {
+    if !star_pickup_events.is_empty() {
+        // This prevents events staying active on the next frame.
+        star_pickup_events.clear();
+
+        // Randomely play one of the two sounds
+        audio.play_with_settings(
+            audio_assets.star_pickup.clone(),
+            PlaybackSettings {
+                volume: 0.5,
+                ..Default::default()
+            },
+        );
     }
 }

@@ -1,58 +1,57 @@
 mod actions;
+mod asset_loader;
 mod audio;
 mod camera;
 mod enemy;
-mod loading;
+mod events;
 mod menu;
 mod physics;
 mod player;
+mod resources;
 mod star;
-mod state;
+mod states;
+mod systems;
+mod walls;
 
 use crate::actions::ActionsPlugin;
+use crate::asset_loader::AssetLoaderPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::camera::CameraPlugin;
 use crate::enemy::EnemyPlugin;
-use crate::loading::LoadingPlugin;
+use crate::events::*;
 use crate::menu::MenuPlugin;
 use crate::physics::InternalPhysicsPlugin;
 use crate::player::PlayerPlugin;
+use crate::resources::*;
 use crate::star::StarPlugin;
-use crate::state::StatePlugin;
+use crate::states::GameState;
+use crate::systems::*;
+use crate::walls::WallsPlugin;
 
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
-
-// This example game uses States to separate logic
-// See https://bevy-cheatbook.github.io/programming/states.html
-// Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
-#[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
-enum GameState {
-    // During the loading State the LoadingPlugin will load our assets
-    #[default]
-    Loading,
-    // During this State the actual game logic is executed
-    Playing,
-    // Here the menu is drawn and waiting for player interaction
-    Menu,
-}
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<GameState>()
+            .add_event::<GameOverEvent>()
+            .init_resource::<Score>()
             .add_plugin(CameraPlugin)
-            .add_plugin(LoadingPlugin)
+            .add_plugin(AssetLoaderPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(InternalPhysicsPlugin)
-            .add_plugin(StatePlugin)
             .add_plugin(MenuPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(StarPlugin)
-            .add_plugin(EnemyPlugin);
+            .add_plugin(EnemyPlugin)
+            .add_plugin(WallsPlugin)
+            .add_system(control_game_exit_event)
+            .add_system(update_score.in_set(OnUpdate(GameState::Playing)))
+            .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Playing)));
 
         #[cfg(debug_assertions)]
         {

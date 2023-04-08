@@ -1,6 +1,8 @@
-use crate::loading::TextureAssets;
-use crate::physics::{PlayingAreaBorder, PLAY_AREA_BORDER_MARGIN};
-use crate::GameState;
+use super::components::*;
+use super::events::*;
+use crate::asset_loader::resources::*;
+use crate::walls::components::Walls;
+use crate::walls::systems::WALLS_MARGIN;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
@@ -10,25 +12,7 @@ const ENEMY_SPEED: f32 = 150.;
 const ENEMY_SIZE: f32 = 64.;
 const NUMBER_OF_ENEMIES: usize = 3;
 
-pub struct EnemyPlugin;
-
-#[derive(Component, Debug)]
-pub struct Enemy;
-
-#[derive(Default)]
-pub struct EnemyHitWallEvent;
-
-impl Plugin for EnemyPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_event::<EnemyHitWallEvent>()
-            .add_system(spawn_enemies.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(move_enemy_controller.in_set(OnUpdate(GameState::Playing)))
-            .add_system(check_for_world_collisions.in_set(OnUpdate(GameState::Playing)));
-        // .add_system(detect_collisions.in_set(OnUpdate(GameState::Playing)));
-    }
-}
-
-fn spawn_enemies(
+pub fn spawn_enemies(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -36,8 +20,8 @@ fn spawn_enemies(
     let window = window_query.get_single().unwrap();
 
     for _ in 0..NUMBER_OF_ENEMIES {
-        let random_x = random::<f32>() * (window.width() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
-        let random_y = random::<f32>() * (window.height() - PLAY_AREA_BORDER_MARGIN - ENEMY_SIZE);
+        let random_x = random::<f32>() * (window.width() - WALLS_MARGIN - ENEMY_SIZE);
+        let random_y = random::<f32>() * (window.height() - WALLS_MARGIN - ENEMY_SIZE);
         let velocity = Vec2::new(random::<f32>(), random::<f32>()).normalize() * ENEMY_SPEED;
         commands
             .spawn(SpriteBundle {
@@ -63,20 +47,16 @@ fn spawn_enemies(
     }
 }
 
-fn move_enemy_controller(mut enemy_query: Query<&mut Velocity, With<Enemy>>) {
+pub fn move_enemy_controller(mut enemy_query: Query<&mut Velocity, With<Enemy>>) {
     for mut enemy_velocity in &mut enemy_query {
         // Keep constant speed at all times for enemies
         enemy_velocity.linvel = enemy_velocity.linvel.normalize() * ENEMY_SPEED;
     }
 }
 
-fn check_for_world_collisions(
-    mut commands: Commands,
+pub fn check_for_world_collisions(
     mut enemy_collider_query: Query<(Entity, &mut Enemy), (With<Collider>, With<Enemy>)>,
-    mut wall_collider_query: Query<
-        (Entity, &PlayingAreaBorder),
-        (With<Collider>, With<PlayingAreaBorder>),
-    >,
+    mut wall_collider_query: Query<(Entity, &Walls), (With<Collider>, With<Walls>)>,
     mut collision_events: EventReader<CollisionEvent>,
     mut enemy_hit_wall_event: EventWriter<EnemyHitWallEvent>,
 ) {
@@ -109,27 +89,27 @@ fn check_for_world_collisions(
     }
 }
 
-// fn detect_collisions(
-//     mut character_controller_outputs: Query<
-//         (&mut Enemy, &mut KinematicCharacterControllerOutput),
-//         With<Enemy>,
-//     >,
-//     mut enemy_hit_wall_event: EventWriter<EnemyHitWallEvent>,
-// ) {
-//     for (mut enemy, mut output) in character_controller_outputs.iter_mut() {
-//         for collision in &output.collisions {
-//             let mut direction_changed = false;
-//             if collision.toi.normal1.x == 1. || collision.toi.normal1.x == -1. {
-//                 direction_changed = true;
-//                 enemy.direction.x *= -1.;
-//             } else if collision.toi.normal1.y == 1. || collision.toi.normal1.y == -1. {
-//                 direction_changed = true;
-//                 enemy.direction.y *= -1.;
-//             }
-//             println!("Direction {:?}", enemy.direction)
-//             // if direction_changed {
-//             //     enemy_hit_wall_event.send_default();
-//             // }
-//         }
-//     }
-// }
+pub fn play_enemy_wall_hit_sound(
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
+    mut enemy_hit_wall_events: EventReader<EnemyHitWallEvent>,
+) {
+    if !enemy_hit_wall_events.is_empty() {
+        // This prevents events staying active on the next frame.
+        enemy_hit_wall_events.clear();
+
+        // Randomely play one of the two sounds
+        let sound_effect = if rand::random() {
+            audio_assets.enemy_hit_wall_1.clone()
+        } else {
+            audio_assets.enemy_hit_wall_2.clone()
+        };
+        audio.play_with_settings(
+            sound_effect,
+            PlaybackSettings {
+                volume: 0.5,
+                ..Default::default()
+            },
+        );
+    }
+}
