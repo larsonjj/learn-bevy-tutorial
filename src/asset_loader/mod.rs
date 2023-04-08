@@ -1,4 +1,4 @@
-use crate::GameState;
+use super::states::GameState;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
@@ -14,7 +14,7 @@ pub struct AssetLoaderPlugin;
 impl Plugin for AssetLoaderPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(GameState::Loading).continue_to_state(GameState::Menu),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::MainMenu),
         )
         .add_collection_to_loading_state::<_, FontAssets>(GameState::Loading)
         .add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading)

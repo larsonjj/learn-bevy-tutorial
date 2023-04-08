@@ -9,7 +9,7 @@ pub enum GameState {
     #[default]
     Loading,
     // During this State the actual game logic is executed
-    Playing,
+    Game,
     // Here the menu is drawn and waiting for player interaction
-    Menu,
+    MainMenu,
 }

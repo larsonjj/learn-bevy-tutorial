@@ -1,16 +1,33 @@
 // disable console on windows for release builds
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+pub mod actions;
+pub mod asset_loader;
+mod camera;
+mod game;
+mod main_menu;
+pub mod states;
+mod systems;
+
+use actions::ActionsPlugin;
+use asset_loader::AssetLoaderPlugin;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
-use learn_bevy_tutorial::GamePlugin;
+use camera::CameraPlugin;
+use game::GamePlugin;
+use main_menu::MainMenuPlugin;
+use states::GameState;
 use std::io::Cursor;
 use winit::window::Icon;
 
 fn main() {
-    App::new()
+    let mut binding = App::new();
+
+    let app = binding
+        .add_state::<GameState>()
         .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -22,9 +39,21 @@ fn main() {
             }),
             ..default()
         }))
+        .add_plugin(AssetLoaderPlugin)
+        .add_plugin(ActionsPlugin)
+        .add_plugin(CameraPlugin)
+        .add_plugin(MainMenuPlugin)
         .add_plugin(GamePlugin)
-        .add_system(set_window_icon.on_startup())
-        .run();
+        .add_system(set_window_icon.on_startup());
+
+    #[cfg(debug_assertions)]
+    {
+        app.add_plugin(FrameTimeDiagnosticsPlugin::default())
+            .add_plugin(LogDiagnosticsPlugin::default());
+    }
+
+    // Start the app
+    app.run();
 }
 
 // Sets the icon on windows and X11

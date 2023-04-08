@@ -1,5 +1,5 @@
 use super::resources::*;
-use crate::{asset_loader::resources::FontAssets, GameState};
+use crate::{asset_loader::resources::FontAssets, states::GameState};
 use bevy::prelude::*;
 
 pub fn setup_menu(
@@ -42,7 +42,7 @@ pub fn click_play_button(
     for (interaction, mut color) in &mut interaction_query {
         match *interaction {
             Interaction::Clicked => {
-                state.set(GameState::Playing);
+                state.set(GameState::Game);
             }
             Interaction::Hovered => {
                 *color = button_colors.hovered.into();

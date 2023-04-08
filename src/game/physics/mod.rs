@@ -1,4 +1,3 @@
-use crate::GameState;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -8,10 +7,10 @@ use systems::*;
 
 type RapierPlugin = RapierPhysicsPlugin<NoUserData>;
 
-pub struct InternalPhysicsPlugin;
+pub struct GamePhysicsPlugin;
 
 // Bevy Plugin for handling rapier physics
-impl Plugin for InternalPhysicsPlugin {
+impl Plugin for GamePhysicsPlugin {
     fn build(&self, app: &mut App) {
         let rapier_config = RapierConfiguration {
             gravity: Vec2::ZERO,
@@ -32,7 +31,7 @@ impl Plugin for InternalPhysicsPlugin {
 
         #[cfg(debug_assertions)]
         {
-            // app.add_system(display_collision_events.in_set(OnUpdate(GameState::Playing)));
+            // app.add_system(display_collision_events.in_set(OnUpdate(GameState::Game)));
         }
     }
 }
