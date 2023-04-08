@@ -1,8 +1,8 @@
 use super::components::*;
 use super::resources::*;
 use super::STAR_SIZE;
-use crate::asset_loader::resources::*;
 use crate::game::walls::WALLS_MARGIN;
+use crate::loading::resources::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;

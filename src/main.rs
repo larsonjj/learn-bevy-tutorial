@@ -2,20 +2,20 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 pub mod actions;
-pub mod asset_loader;
 mod camera;
 mod game;
+pub mod loading;
 mod main_menu;
 pub mod states;
 mod systems;
 
 use actions::ActionsPlugin;
-use asset_loader::AssetLoaderPlugin;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::DefaultPlugins;
 use camera::CameraPlugin;
 use game::GamePlugin;
+use loading::LoadingPlugin;
 use main_menu::MainMenuPlugin;
 use states::AppState;
 use systems::*;
@@ -41,7 +41,7 @@ fn main() {
         .add_system(set_window_icon.on_startup())
         .add_system(handle_app_exit_event)
         // My Plugins
-        .add_plugin(AssetLoaderPlugin)
+        .add_plugin(LoadingPlugin)
         .add_plugin(ActionsPlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(MainMenuPlugin)

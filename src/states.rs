@@ -5,7 +5,7 @@ use bevy::prelude::*;
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AppState {
-    // During the loading State the AssetLoaderPlugin will load our assets
+    // During the loading State the LoadingPlugin will load our assets
     #[default]
     Loading,
     // During this State the actual game logic is executed

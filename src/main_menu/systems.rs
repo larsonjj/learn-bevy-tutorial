@@ -1,5 +1,5 @@
 use super::resources::*;
-use crate::{asset_loader::resources::FontAssets, states::AppState};
+use crate::{loading::resources::FontAssets, states::AppState};
 use bevy::prelude::*;
 
 pub fn setup_menu(

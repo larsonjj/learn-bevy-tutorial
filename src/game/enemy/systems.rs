@@ -1,9 +1,9 @@
 use super::components::*;
 use super::events::*;
 use super::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
-use crate::asset_loader::resources::*;
 use crate::game::walls::components::Walls;
 use crate::game::walls::WALLS_MARGIN;
+use crate::loading::resources::*;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;

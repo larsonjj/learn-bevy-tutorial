@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::asset_loader::resources::AudioAssets;
+use crate::loading::resources::AudioAssets;
 
 pub fn start_background_audio(audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
     audio.play_with_settings(
