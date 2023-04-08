@@ -6,6 +6,8 @@ pub mod systems;
 
 use systems::*;
 
+pub const WALLS_MARGIN: f32 = 5.0;
+
 pub struct WallsPlugin;
 
 impl Plugin for WallsPlugin {

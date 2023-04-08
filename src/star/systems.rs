@@ -1,13 +1,12 @@
 use super::components::*;
 use super::resources::*;
+use super::STAR_SIZE;
 use crate::asset_loader::resources::*;
-use crate::walls::systems::WALLS_MARGIN;
+use crate::walls::WALLS_MARGIN;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use rand::prelude::*;
-
-const STAR_SIZE: f32 = 30.;
 
 pub fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
     star_spawn_timer.timer.tick(time.delta());

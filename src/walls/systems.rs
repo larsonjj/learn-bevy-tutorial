@@ -1,8 +1,7 @@
 use super::components::*;
+use super::WALLS_MARGIN;
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier2d::prelude::*;
-
-pub const WALLS_MARGIN: f32 = 5.0;
 
 // This system is responsible for setting up the play area pyhsics bounds
 pub fn spawn_walls(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {

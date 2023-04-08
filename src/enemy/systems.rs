@@ -1,16 +1,13 @@
 use super::components::*;
 use super::events::*;
+use super::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
 use crate::asset_loader::resources::*;
 use crate::walls::components::Walls;
-use crate::walls::systems::WALLS_MARGIN;
+use crate::walls::WALLS_MARGIN;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
 use rand::prelude::*;
-
-const ENEMY_SPEED: f32 = 150.;
-const ENEMY_SIZE: f32 = 64.;
-const NUMBER_OF_ENEMIES: usize = 3;
 
 pub fn spawn_enemies(
     mut commands: Commands,
