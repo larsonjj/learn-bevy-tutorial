@@ -8,6 +8,9 @@ mod systems;
 use events::*;
 use systems::*;
 
+const PLAYER_SPEED: f32 = 300.;
+const PLAYER_SIZE: f32 = 64.;
+
 pub struct PlayerPlugin;
 
 /// This plugin handles player related stuff like movement

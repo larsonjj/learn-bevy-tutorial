@@ -8,6 +8,9 @@ mod systems;
 use resources::*;
 use systems::*;
 
+const STAR_SPAWN_TIME: f32 = 5.0;
+const STAR_SIZE: f32 = 30.;
+
 pub struct StarPlugin;
 
 impl Plugin for StarPlugin {

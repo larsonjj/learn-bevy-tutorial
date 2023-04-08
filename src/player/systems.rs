@@ -1,5 +1,6 @@
 use super::components::*;
 use super::events::*;
+use super::{PLAYER_SIZE, PLAYER_SPEED};
 use crate::actions::resources::Actions;
 use crate::asset_loader::resources::*;
 use crate::enemy::components::Enemy;
@@ -9,9 +10,6 @@ use crate::star::components::Star;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_rapier2d::prelude::*;
-
-const PLAYER_SPEED: f32 = 300.;
-const PLAYER_SIZE: f32 = 64.;
 
 pub fn spawn_player(
     mut commands: Commands,
