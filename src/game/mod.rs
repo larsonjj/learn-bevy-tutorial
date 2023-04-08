@@ -7,6 +7,7 @@ mod resources;
 mod star;
 mod states;
 mod systems;
+mod ui;
 pub mod walls;
 
 use crate::states::AppState;
@@ -20,6 +21,7 @@ use resources::*;
 use star::StarPlugin;
 use states::*;
 use systems::*;
+use ui::GameUIPlugin;
 use walls::WallsPlugin;
 
 pub struct GamePlugin;
@@ -36,6 +38,7 @@ impl Plugin for GamePlugin {
             .add_plugin(StarPlugin)
             .add_plugin(EnemyPlugin)
             .add_plugin(WallsPlugin)
+            .add_plugin(GameUIPlugin)
             .add_system(update_score.in_set(OnUpdate(AppState::Game)))
             .add_system(handle_game_over_event.in_set(OnUpdate(AppState::Game)))
             .add_system(toggle_simulation.run_if(in_state(AppState::Game)))

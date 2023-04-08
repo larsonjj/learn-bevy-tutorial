@@ -10,7 +10,7 @@ pub fn spawn_main_menu(
     font_assets: Res<FontAssets>,
     textures: Res<TextureAssets>,
 ) {
-    build_main_menu(&mut commands, textures, font_assets);
+    build_main_menu(&mut commands, &textures, &font_assets);
 }
 
 pub fn despawn_main_menu(mut commands: Commands, main_menu_query: Query<Entity, With<MainMenu>>) {
@@ -21,8 +21,8 @@ pub fn despawn_main_menu(mut commands: Commands, main_menu_query: Query<Entity, 
 
 pub fn build_main_menu(
     commands: &mut Commands,
-    textures: Res<TextureAssets>,
-    font_assets: Res<FontAssets>,
+    textures: &Res<TextureAssets>,
+    font_assets: &Res<FontAssets>,
 ) -> Entity {
     let main_menu_entity = commands
         .spawn((
