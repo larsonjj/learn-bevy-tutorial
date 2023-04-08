@@ -41,6 +41,8 @@ impl Plugin for PlayerPlugin {
                 check_for_world_collisions
                     .in_set(OnUpdate(AppState::Game))
                     .in_set(OnUpdate(SimulationState::Running)),
-            );
+            )
+            // On Exit State
+            .add_system(despawn_player.in_schedule(OnExit(AppState::Game)));
     }
 }

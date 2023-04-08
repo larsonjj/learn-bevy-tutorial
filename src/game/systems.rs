@@ -44,6 +44,6 @@ pub fn handle_game_over_event(
         // This prevents events staying active on the next frame.
         game_over_events.clear();
         println!("Game Over! Score: {}", score.value);
-        // app_state_next_state.set(AppState::GameOver);
+        app_state_next_state.set(AppState::GameOver);
     }
 }

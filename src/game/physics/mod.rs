@@ -44,8 +44,8 @@ impl Plugin for GamePhysicsPlugin {
                 always_on_top: true,
                 enabled: true,
                 ..default()
-            });
-            //.add_system(display_collision_events.in_set(OnUpdate(AppState::Game)));
+            })
+            .add_system(display_collision_events.in_set(OnUpdate(AppState::Game)));
         }
     }
 }
