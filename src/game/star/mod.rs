@@ -27,6 +27,7 @@ impl Plugin for StarPlugin {
                 spawn_stars_over_time
                     .in_set(OnUpdate(AppState::Game))
                     .in_set(OnUpdate(SimulationState::Running)),
-            );
+            )
+            .add_system(despawn_stars.in_schedule(OnExit(AppState::Game)));
     }
 }

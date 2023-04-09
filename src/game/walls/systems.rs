@@ -32,3 +32,9 @@ pub fn spawn_walls(mut commands: Commands, window_query: Query<&Window, With<Pri
         ))
         .insert(Walls);
 }
+
+pub fn despawn_walls(mut commands: Commands, walls_query: Query<Entity, With<Walls>>) {
+    if let Ok(walls_entity) = walls_query.get_single() {
+        commands.entity(walls_entity).despawn_recursive();
+    }
+}

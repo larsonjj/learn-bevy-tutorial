@@ -27,6 +27,7 @@ impl Plugin for GamePhysicsPlugin {
 
         app.insert_resource(rapier_config)
             .add_plugin(RapierPlugin::pixels_per_meter(100.))
+            .add_system(run_simulation.in_schedule(OnEnter(AppState::Game)))
             .add_system(
                 run_simulation
                     .in_set(OnUpdate(AppState::Game))
@@ -36,7 +37,8 @@ impl Plugin for GamePhysicsPlugin {
                 pause_simulation
                     .in_set(OnUpdate(AppState::Game))
                     .in_set(OnUpdate(SimulationState::Paused)),
-            );
+            )
+            .add_system(pause_simulation.in_schedule(OnExit(AppState::Game)));
 
         #[cfg(debug_assertions)]
         {

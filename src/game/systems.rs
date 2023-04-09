@@ -18,6 +18,7 @@ pub fn toggle_simulation(
     mut simulation_state_next_state: ResMut<NextState<SimulationState>>,
 ) {
     if actions.pause {
+        println!("Pause button pressed. {:?}", actions.pause);
         if simulation_state.0 == SimulationState::Running {
             simulation_state_next_state.set(SimulationState::Paused);
             println!("Simulation Paused.");

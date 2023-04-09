@@ -10,6 +10,7 @@ pub struct WallsPlugin;
 
 impl Plugin for WallsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_walls.in_schedule(OnEnter(AppState::Game)));
+        app.add_system(spawn_walls.in_schedule(OnEnter(AppState::Game)))
+            .add_system(despawn_walls.in_schedule(OnExit(AppState::Game)));
     }
 }

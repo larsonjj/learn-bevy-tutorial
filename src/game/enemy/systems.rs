@@ -43,6 +43,12 @@ pub fn spawn_enemies(
     }
 }
 
+pub fn despawn_enemies(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
+    for enemy_entity in enemy_query.iter() {
+        commands.entity(enemy_entity).despawn();
+    }
+}
+
 pub fn move_enemy_controller(mut enemy_query: Query<&mut Velocity, With<Enemy>>) {
     for mut enemy_velocity in &mut enemy_query {
         // Keep constant speed at all times for enemies

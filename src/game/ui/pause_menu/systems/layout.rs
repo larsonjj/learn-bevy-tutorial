@@ -19,7 +19,7 @@ pub fn despawn_pause_menu(
     mut commands: Commands,
     pause_menu_query: Query<Entity, With<PauseMenu>>,
 ) {
-    println!("Deppawning Pause Menu");
+    println!("Despawning Pause Menu");
     if let Ok(pause_menu_entity) = pause_menu_query.get_single() {
         commands.entity(pause_menu_entity).despawn_recursive();
     }

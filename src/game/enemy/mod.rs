@@ -34,6 +34,7 @@ impl Plugin for EnemyPlugin {
                 check_for_world_collisions
                     .in_set(OnUpdate(AppState::Game))
                     .in_set(OnUpdate(SimulationState::Running)),
-            );
+            )
+            .add_system(despawn_enemies.in_schedule(OnExit(AppState::Game)));
     }
 }
