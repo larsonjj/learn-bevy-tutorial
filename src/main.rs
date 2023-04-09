@@ -1,29 +1,14 @@
 // disable console on windows for release builds
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-pub mod actions;
-mod camera;
-mod game;
-pub mod loading;
-mod main_menu;
-pub mod states;
-mod systems;
-
-use actions::ActionsPlugin;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::DefaultPlugins;
-use camera::CameraPlugin;
-use game::GamePlugin;
-use loading::LoadingPlugin;
-use main_menu::MainMenuPlugin;
-use states::AppState;
-use systems::*;
+use learn_bevy_tutorial::states::*;
+use learn_bevy_tutorial::systems::*;
+use learn_bevy_tutorial::LibPlugin;
 
 fn main() {
-    let mut binding = App::new();
-
-    let app = binding
+    App::new()
         // Bevy
         .add_state::<AppState>()
         .insert_resource(Msaa::Off)
@@ -41,18 +26,6 @@ fn main() {
         .add_system(set_window_icon.on_startup())
         .add_system(handle_app_exit_event)
         // My Plugins
-        .add_plugin(LoadingPlugin)
-        .add_plugin(ActionsPlugin)
-        .add_plugin(CameraPlugin)
-        .add_plugin(MainMenuPlugin)
-        .add_plugin(GamePlugin);
-
-    #[cfg(debug_assertions)]
-    {
-        app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-            .add_plugin(LogDiagnosticsPlugin::default());
-    }
-
-    // Start the app
-    app.run();
+        .add_plugin(LibPlugin)
+        .run();
 }

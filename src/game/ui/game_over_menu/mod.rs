@@ -6,7 +6,7 @@ use systems::interactions::*;
 use systems::layout::*;
 use systems::updates::*;
 
-use crate::AppState;
+use crate::states::AppState;
 use bevy::prelude::*;
 
 pub struct GameOverMenuPlugin;

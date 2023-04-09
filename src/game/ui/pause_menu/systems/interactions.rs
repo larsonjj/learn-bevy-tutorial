@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use crate::game::ui::pause_menu::components::*;
 use crate::game::ui::pause_menu::styles::*;
 use crate::game::SimulationState;
-use crate::AppState;
+use crate::states::AppState;
 
 pub fn interact_with_resume_button(
     mut button_query: Query<
