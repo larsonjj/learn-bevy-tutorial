@@ -32,6 +32,7 @@ impl Plugin for GamePlugin {
             .add_state::<SimulationState>()
             .init_resource::<Score>()
             .add_system(start_simulation.in_schedule(OnEnter(AppState::Game)))
+            .add_system(reset_score.in_schedule(OnEnter(AppState::Game)))
             .add_plugin(GameAudioPlugin)
             .add_plugin(GamePhysicsPlugin)
             .add_plugin(PlayerPlugin)

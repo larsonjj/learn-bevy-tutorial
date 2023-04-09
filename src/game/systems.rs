@@ -48,3 +48,7 @@ pub fn handle_game_over_event(
         app_state_next_state.set(AppState::GameOver);
     }
 }
+
+pub fn reset_score(mut score: ResMut<Score>) {
+    score.value = 0;
+}
