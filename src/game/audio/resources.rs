@@ -1,4 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Resource)]
-pub struct BackgroundMusicAudio(Handle<AudioSource>);
+#[derive(Default, Resource)]
+pub struct BackgroundMusicAudio {
+    pub handle: Handle<AudioSink>,
+}

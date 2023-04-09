@@ -4,7 +4,8 @@ use bevy::prelude::*;
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum SimulationState {
-    #[default]
     Running,
     Paused,
+    #[default]
+    Stopped,
 }

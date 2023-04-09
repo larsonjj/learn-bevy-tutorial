@@ -4,11 +4,11 @@ use bevy::prelude::*;
 
 use super::{events::GameOverEvent, resources::Score};
 
-pub fn pause_simulation(mut simulation_state_next_state: ResMut<NextState<SimulationState>>) {
-    simulation_state_next_state.set(SimulationState::Paused);
+pub fn stop_simulation(mut simulation_state_next_state: ResMut<NextState<SimulationState>>) {
+    simulation_state_next_state.set(SimulationState::Stopped);
 }
 
-pub fn resume_simulation(mut simulation_state_next_state: ResMut<NextState<SimulationState>>) {
+pub fn start_simulation(mut simulation_state_next_state: ResMut<NextState<SimulationState>>) {
     simulation_state_next_state.set(SimulationState::Running);
 }
 

@@ -47,7 +47,7 @@ pub fn build_game_over_menu(commands: &mut Commands, font_assets: &Res<FontAsset
                         TextBundle {
                             text: Text {
                                 sections: vec![TextSection::new(
-                                    "Your final score was:",
+                                    "Final Score:",
                                     get_final_score_text_style(&font_assets),
                                 )],
                                 alignment: TextAlignment::Center,

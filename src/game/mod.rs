@@ -31,7 +31,7 @@ impl Plugin for GamePlugin {
         app.add_event::<GameOverEvent>()
             .add_state::<SimulationState>()
             .init_resource::<Score>()
-            // .add_system(pause_simulation.in_schedule(OnEnter(AppState::Game)))
+            .add_system(start_simulation.in_schedule(OnEnter(AppState::Game)))
             .add_plugin(GameAudioPlugin)
             .add_plugin(GamePhysicsPlugin)
             .add_plugin(PlayerPlugin)
@@ -42,6 +42,6 @@ impl Plugin for GamePlugin {
             .add_system(update_score.in_set(OnUpdate(AppState::Game)))
             .add_system(handle_game_over_event.in_set(OnUpdate(AppState::Game)))
             .add_system(toggle_simulation.run_if(in_state(AppState::Game)))
-            .add_system(resume_simulation.in_schedule(OnExit(AppState::Game)));
+            .add_system(stop_simulation.in_schedule(OnExit(AppState::Game)));
     }
 }
