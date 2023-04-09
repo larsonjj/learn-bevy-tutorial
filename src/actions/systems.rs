@@ -8,6 +8,7 @@ pub enum GameControl {
     Left,
     Right,
     Escape,
+    Pause,
 }
 
 impl GameControl {
@@ -25,7 +26,14 @@ impl GameControl {
             GameControl::Right => {
                 keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
             }
-            GameControl::Escape => keyboard_input.pressed(KeyCode::Escape),
+            _ => false,
+        }
+    }
+    pub fn just_pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
+        match self {
+            GameControl::Escape => keyboard_input.just_pressed(KeyCode::Escape),
+            GameControl::Pause => keyboard_input.just_pressed(KeyCode::P),
+            _ => false,
         }
     }
 }
@@ -38,7 +46,7 @@ pub fn get_movement(control: GameControl, input: &Res<Input<KeyCode>>) -> f32 {
     }
 }
 
-pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
+pub fn handle_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
     let player_movement = Vec2::new(
         get_movement(GameControl::Right, &keyboard_input)
             - get_movement(GameControl::Left, &keyboard_input),
@@ -54,7 +62,15 @@ pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<In
 }
 
 pub fn handle_escape(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
-    if GameControl::Escape.pressed(&keyboard_input) {
+    if GameControl::Escape.just_pressed(&keyboard_input) {
         actions.exit_game = true;
+    }
+}
+
+pub fn handle_pause(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>) {
+    if GameControl::Pause.just_pressed(&keyboard_input) {
+        actions.pause = true;
+    } else {
+        actions.pause = false;
     }
 }

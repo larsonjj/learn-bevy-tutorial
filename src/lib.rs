@@ -1,57 +1,33 @@
-mod actions;
-mod asset_loader;
-mod audio;
+// disable console on windows for release builds
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+pub mod actions;
 mod camera;
-mod enemy;
-mod events;
-mod menu;
-mod physics;
-mod player;
-mod resources;
-mod star;
-mod states;
-mod systems;
-mod walls;
+mod game;
+mod loading;
+mod main_menu;
+pub mod states;
+pub mod systems;
 
 use crate::actions::ActionsPlugin;
-use crate::asset_loader::AssetLoaderPlugin;
-use crate::audio::InternalAudioPlugin;
 use crate::camera::CameraPlugin;
-use crate::enemy::EnemyPlugin;
-use crate::events::*;
-use crate::menu::MenuPlugin;
-use crate::physics::InternalPhysicsPlugin;
-use crate::player::PlayerPlugin;
-use crate::resources::*;
-use crate::star::StarPlugin;
-use crate::states::GameState;
-use crate::systems::*;
-use crate::walls::WallsPlugin;
-
-#[cfg(debug_assertions)]
+use crate::game::GamePlugin;
+use crate::loading::LoadingPlugin;
+use crate::main_menu::MainMenuPlugin;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
-pub struct GamePlugin;
+pub struct LibPlugin;
 
-impl Plugin for GamePlugin {
+impl Plugin for LibPlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<GameState>()
-            .add_event::<GameOverEvent>()
-            .init_resource::<Score>()
-            .add_plugin(CameraPlugin)
-            .add_plugin(AssetLoaderPlugin)
+        app
+            // My Plugins
+            .add_plugin(LoadingPlugin)
             .add_plugin(ActionsPlugin)
-            .add_plugin(InternalAudioPlugin)
-            .add_plugin(InternalPhysicsPlugin)
-            .add_plugin(MenuPlugin)
-            .add_plugin(PlayerPlugin)
-            .add_plugin(StarPlugin)
-            .add_plugin(EnemyPlugin)
-            .add_plugin(WallsPlugin)
-            .add_system(control_game_exit_event)
-            .add_system(update_score.in_set(OnUpdate(GameState::Playing)))
-            .add_system(handle_game_over_event.in_set(OnUpdate(GameState::Playing)));
+            .add_plugin(CameraPlugin)
+            .add_plugin(MainMenuPlugin)
+            .add_plugin(GamePlugin);
 
         #[cfg(debug_assertions)]
         {
